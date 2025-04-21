@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Page Change Watcher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      width: 380px;
+      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      color: #1a1a1a;
+      background: #f8f9fa;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 18px;
+      color: #2b3137;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 4px;
+      border: 1px solid #e9ecef;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .panel {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      margin-right: 8px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #e5e7eb;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #3b82f6;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .toggle-label {
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+
+    button.primary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    button.primary:hover {
+      background: #2563eb;
+    }
+
+    button.primary.stop {
+      background: #ef4444;
+    }
+
+    button.primary.stop:hover {
+      background: #dc2626;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .status.active {
+      background: #ecfdf5;
+      color: #059669;
+    }
+
+    .status.inactive {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Page Change Watcher</h1>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="monitor">Monitor</div>
+    <div class="tab" data-tab="settings">Settings</div>
+  </div>
+
+  <div class="panel active" id="monitor-panel">
+    <div class="input-group">
+      <label for="customPrompt">Monitoring Instruction</label>
+      <textarea id="customPrompt" placeholder="E.g., check if 'in progress' has changed to 'success'" rows="4" required style="width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; resize: vertical;"></textarea>
+      <div class="hint" style="font-size: 12px; color: #6b7280; margin-top: 4px;">Describe what to watch for. The LLM will analyze the entire page text using your instruction.</div>
+    </div>
+
+    <div class="input-group">
+      <label for="interval">Refresh Interval (seconds)</label>
+      <input type="number" id="interval" value="60" min="30">
+    </div>
+
+    <div class="toggle-group">
+      <label class="toggle">
+        <input type="checkbox" id="autoRefresh">
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">Auto Refresh</span>
+    </div>
+
+    <button id="toggleWatch" class="primary">Start Watching</button>
+
+    <div id="watchStatus" class="status inactive">Currently not monitoring</div>
+  </div>
+
+  <div class="panel" id="settings-panel">
+    <div class="input-group">
+      <label for="openrouterKey">OpenRouter API Key</label>
+      <input type="password" id="openrouterKey" placeholder="sk-or-v1-...">
+    </div>
+
+    <div class="toggle-group">
+      <label class="toggle">
+        <input type="checkbox" id="enableSms">
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">SMS Notifications</span>
+    </div>
+
+    <div id="smsSettings" style="display: none;">
+      <div class="input-group">
+        <label for="twilioSid">Twilio Account SID</label>
+        <input type="password" id="twilioSid" placeholder="AC...">
+      </div>
+      <div class="input-group">
+        <label for="twilioToken">Twilio Auth Token</label>
+        <input type="password" id="twilioToken" placeholder="Enter auth token">
+      </div>
+      <div class="input-group">
+        <label for="twilioMsgSid">Twilio Message Service SID</label>
+        <input type="password" id="twilioMsgSid" placeholder="MG...">
+      </div>
+      <div class="input-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" placeholder="+1234567890">
+      </div>
+    </div>
+
+    <div class="toggle-group">
+      <label class="toggle">
+        <input type="checkbox" id="enableEmail">
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">Email Notifications</span>
+    </div>
+
+    <div id="emailSettings" style="display: none;">
+      <div class="input-group">
+        <label for="emailAddress">Email Address</label>
+        <input type="email" id="emailAddress" placeholder="your@email.com">
+      </div>
+    </div>
+
+    <button id="saveSettings" class="primary">Save Settings</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

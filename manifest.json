@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Page Change Watcher",
+  "version": "1.0",
+  "description": "Monitor webpages for specific text changes using LLM and get notifications",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://*.openrouter.ai/*",
+    "https://*.twilio.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content.js"]
+  }]
+}

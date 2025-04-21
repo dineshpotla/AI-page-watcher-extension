@@ -1,0 +1,11 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.pyc
+.vscode/
+*.ipynb
+dashboard_hash.txt
+last_dashboard_snapshot.json
+login_debug.png
+main

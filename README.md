@@ -1,12 +1,12 @@
 # Page Change Watcher
 
-A professional Chrome extension to monitor any webpage for changes using LLMs (LLaMA 4 Maverick via OpenRouter). Get instant SMS, email, and desktop notifications when your custom monitoring instruction is satisfied.
+A professional Chrome extension to monitor any webpage for changes using LLMs (any model available via OpenRouter). Get instant SMS, email, and desktop notifications when your custom monitoring instruction is satisfied.
 
 ---
 
 ## Features
 
-- **LLM-based monitoring:** Uses OpenRouter’s LLaMA 4 Maverick model to analyze full page text with your custom prompt/instruction.
+- **LLM-based monitoring:** Uses any model available via OpenRouter to analyze full page text with your custom prompt/instruction.
 - **Flexible change detection:** You define what to watch for (status changes, keyword appearance, etc.) using natural language.
 - **SMS alerts:** Send SMS notifications via Twilio (user-configurable).
 - **Email alerts:** (Stub for integration) Add your provider for email notifications.
@@ -37,7 +37,7 @@ A professional Chrome extension to monitor any webpage for changes using LLMs (L
 5. Click **Start Watching**.
 6. Grant notification permissions when prompted.
 
-The extension will monitor the page, send your instruction and the page text to the LLM, and notify you when a change is detected (based on LLM’s structured JSON response).
+The extension will monitor the page, send your instruction and the page text to the LLM (via OpenRouter, using your selected model), and notify you when a change is detected (based on the LLM’s structured JSON response).
 
 ---
 
